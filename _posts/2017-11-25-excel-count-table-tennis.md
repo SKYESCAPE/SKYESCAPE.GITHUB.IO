@@ -10,7 +10,7 @@ description: 文章金句。
 最近和球友打球，每周六一次比赛，前三名有奖品，但是前三名基本位置不变，于是商量打算使用积分制，然而，大家貌似都没有时间也不会对这个积分进行计算。
 
 为此，我仿照ChinaTT写了一个可以根据输入自主计算积分的excel文档。效果如下：
-![](https://github.com/SKYESCAPE/SKYESCAPE.GITHUB.IO/article_image/TIM图片20171022213601.jpg)
+![](https://github.com/SKYESCAPE/SKYESCAPE.GITHUB.IO/tree/master/article_image/TIM图片20171022213601.jpg)
 
 
 
