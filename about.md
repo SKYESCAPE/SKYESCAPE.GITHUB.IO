@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "我是谁"
-description: "你的博客描述 " 
+title: "About"
+description: "  " 
 header-img: "img/green.jpg"
 ---
 
