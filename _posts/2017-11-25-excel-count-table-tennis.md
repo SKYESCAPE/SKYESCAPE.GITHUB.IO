@@ -9,7 +9,7 @@ description: 文章金句。
 
 最近和球友打球，每周六一次比赛，前三名有奖品，但是前三名基本位置不变，于是商量打算使用积分制，然而，大家貌似都没有时间也不会对这个积分进行计算。
 
-积分规则：</br>
+积分规则：
 
 会员积分差 |分高胜加、分低负减|	分高负减/分低胜加
 ----|------|----
@@ -46,8 +46,12 @@ description: 文章金句。
 基本语法：and(logical1,logical2, ...)</br>
 作用：检验一组数据是否同时都满足条件
 
-思路：</br>
-1. 加分减分计算：
+思路：
+1. 通过对人名的查找输出对应的积分，求积分差，例：VLOOKUP(G2,B$2:C$98,2)-VLOOKUP(N2,B$2:C$98,2)
+2. 判断赢球或输球，查找积分区间，例：AND(H2>L2,0<=VLOOKUP(G2,B$2:C$98,2)-VLOOKUP(N2,B$2:C$98,2),12>=VLOOKUP(G2,B$2:C$98,2)-VLOOKUP(N2,B$2:C$98,2))
+3. 返回对应的加减分，例：IFS(AND(H2>L2,0<=VLOOKUP(G2,B$2:C$98,2)-VLOOKUP(N2,B$2:C$98,2),12>=VLOOKUP(G2,B$2:C$98,2)-VLOOKUP(N2,B$2:C$98,2)),8)
+4. 计算奖励积分，个人比赛场次计数与个人获胜场次比较，相等则翻倍，例：IF(COUNTIF(G:G,B2)+COUNTIF(N:N,B2)=(SUMIF(G:G,B2,J:J)+SUMIF(N:N,B2,O:O)),(SUMIF(G:G,B2,I:I)+SUMIF(N:N,B2,M:M)),0)
+5. 对上次积分进行累加，例：SUMIF(G:G,B2,I:I)+C2+SUMIF(N:N,B2,M:M)+D2
 
 
 
