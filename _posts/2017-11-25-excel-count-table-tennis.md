@@ -10,16 +10,13 @@ description: 文章金句。
 最近和球友打球，每周六一次比赛，前三名有奖品，但是前三名基本位置不变，于是商量打算使用积分制，然而，大家貌似都没有时间也不会对这个积分进行计算。
 
 积分规则：</br>
+
 | Tables        | Are           | Cool  |
 | ------------- |:-------------:| -----:|
 | col 3 is      | right-aligned | $1600 |
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
 
-作者：简书
-链接：http://www.jianshu.com/p/q81RER
-來源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 为此，我仿照ChinaTT写了一个可以根据输入自主计算乒乓球比赛积分的excel文档。效果如下：
 ![alt text](https://github.com/SKYESCAPE/SKYESCAPE.GITHUB.IO/raw/master/article_image/1_1.jpg)
