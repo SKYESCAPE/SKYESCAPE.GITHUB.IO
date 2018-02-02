@@ -1,4 +1,4 @@
----
+﻿---
 layout: post
 title: 仿ChinaTT乒乓球积分计算表Excel版
 date: 2017-10-28
@@ -29,7 +29,7 @@ description: 文章金句。
 为此，我仿照ChinaTT写了一个可以根据输入自主计算乒乓球比赛积分的excel文档。效果如下：
 ![alt text](https://github.com/SKYESCAPE/SKYESCAPE.GITHUB.IO/raw/master/article_image/1_1.jpg)
 
-首先介绍一下几个相关EXCEL函数
+介绍一下几个相关EXCEL函数
 1. VLOOKUP函数(vertical-lookup,即竖直查找)</br>
 基本语法：VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])，即VLOOKUP(查找值，查找范围，查找列数，精确匹配或者近似匹配）。</br>
 作用：根据查找值参数，在查找范围的第一列搜索查找值，找到该值后，则返回值为：以第一列为准，往后推数查找列数值的这一列所对应的值。
