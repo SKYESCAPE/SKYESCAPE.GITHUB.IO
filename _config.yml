@@ -2,15 +2,15 @@
 title: 听书人 # 你的博客名字，可以定义修订
 header-img: "img/green.jpg"
 tagline: "cn"  
-description: "OUCHJK"  # 一句话描述你的博客
+description: "硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员"  # 一句话描述你的博客
 baseurl: ""
 url: "http://houjiakun.com"  # 此处填写你的博客地址 
 
 # About/contact
 owner: 
   name: "猴子啊" # 填写作者信息：名字
-  email: VIP1393360775@QQ.COM # 填写作者信息：邮箱
-  bio: "我很懒" # 填写作者信息：博客描述
+  email: HOUJKOUC@163.COM # 填写作者信息：邮箱
+  bio: "硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员" # 填写作者信息：博客描述
 
 # Data
 gavatar: http://openmindclub.qiniudn.com/omt/favicon.png # 浏览器地址栏小图标，可自定义更改
@@ -36,7 +36,7 @@ defaults:
       type: "posts"
     values:
       layout: "post"
-      author: "Existence" # 你的名字
+      author: "HouJK" # 你的名字
       header-img: "img/green.jpg" # We don't want posts without a header image, that whould mean white on white
 
 

@@ -3,19 +3,19 @@ layout: page
 description: "说书人叹天下旧事如潮，听书人悲欢不过一壶新茶"
 ---
 
-{% for post in paginator.posts %}
-<div class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
+{% for post in paginator.posts %} <!-- 分页输出文章 -->
+<div class="post-preview"> <!-- 博文预览 -->
+    <a href="{{ post.url | prepend: site.baseurl }}"> <!-- 要访问的文章的url-->
         <h2 class="post-title">            
-            {{ post.title }}
+            {{ post.title }}   <!-- 输出文章标题 -->
         </h2>
-        {% if post.subtitle %}
+        {% if post.subtitle %} <!-- 是否具有子标题 -->
         <h3 class="post-subtitle">
-            {{ post.subtitle }}
+            {{ post.subtitle }} <!-- 输出文章子标题 -->
         </h3>
         {% endif %}
         <div class="post-content-preview">
-            {{ post.content | strip_html | truncate:150 }}
+            {{ post.content | strip_html | truncate:150 }} <!-- 获取文章摘要，取前100个字符-->
         </div>
     </a>
     <p class="post-meta">Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}</p>
