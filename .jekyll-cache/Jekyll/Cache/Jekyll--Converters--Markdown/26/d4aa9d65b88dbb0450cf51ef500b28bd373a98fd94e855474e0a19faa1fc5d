@@ -1,0 +1,37 @@
+I"8	<p>之前做飞思卡尔比赛的时候总是出现JLink莫名灯灭，无法识别，然后换了好几个JLink终于忍不住自己刷了一次固件。下面是具体步骤。</p>
+
+<h1 id="jlink板子结构">JLink板子结构</h1>
+<p>常见的JLink内部如图，其中A为ERASE(擦除芯片)，B为TST(进入编程模式)，具体可通过测量ERASE为芯片55脚，TST为芯片40脚，另一端均为3V3</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfykqepkj30j60pk43s.jpg" /></div>
+
+<h1 id="重刷固件库">重刷固件库</h1>
+<h3 id="擦除芯片">擦除芯片</h3>
+<p>计算机USB连接JLink供电，短接ERASE与3V3，5-8秒后断开，断开连接停止供电。(<strong>某些板子上的ERASE与GND相连，务必使用万用表先测量一下，避免短接后电源与地短路</strong>)</p>
+
+<h3 id="进入编程模式">进入编程模式</h3>
+<p>短接TST与3V3，然后计算机USB连接JLink供电(提示无法识别)，10秒后断开USB停止供电，再断开TST与3V3。</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfyl8404j30a102yaa2.jpg" /></div>
+
+<h3 id="安装sam-ba_214">安装sam-ba_2.14</h3>
+
+<p>USB不连接，安装<a href="https://pan.baidu.com/s/1dv3h4S0ZDrsi1gcduVahiQ" target="_black">sam-ba_2.14</a> (密码1ay8，含JLink驱动)</p>
+
+<h3 id="烧录程序">烧录程序</h3>
+<p>安装完软件后，连接USB，电脑设备管理器(我的电脑右键管理，选择设备管理器，选择端口查看)识别AT91芯片，此时打开sam-ba_2.14，选择设备管理器中显示的端口，芯片选择at91sam7s64-ek，然后点击Connect</p>
+
+<div align="center"><img src="http://wx4.sinaimg.cn/mw690/0066Un30ly1g0tfylkrpnj30c704mmx8.jpg" /></div>
+
+<p>打开之后，选择Receive File前小文件夹图标并选择对应型号bin文件，之后点击Send File开始烧录。</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfylvcwlj30lu03raaa.jpg" /></div>
+
+<p>弹出以下两个对话框依次选择Yes、No。</p>
+
+<div align="center"><img src="http://wx2.sinaimg.cn/mw690/0066Un30ly1g0tfym75anj30ey06jglr.jpg" /></div>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfymkrixj30eg06hdfy.jpg" /></div>
+
+<p>烧录完成后断开USB，再重新插上就识别为JLink驱动(驱动安装同上网址)</p>
+:ET

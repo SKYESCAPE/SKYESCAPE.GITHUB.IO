@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员">
+
+    <title>浅水级ROV结构设计介绍(上) - 听书人</title>
+
+    <link rel="canonical" href="http://localhost:4000/blog/2019/01/22/ROV/">
+
+    <!-- Icons -->
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+
+
+
+
+
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">听书人</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">Archive</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">？？？</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/green.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="Tags">
+                        
+                        <a class="tag" href="/Tags/#ROV" title="ROV">ROV</a>
+                        
+                    </div>
+                    <h1>浅水级ROV结构设计介绍(上)</h1>
+                    
+                    <span class="meta">Posted by HouJK on January 22, 2019</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
+
+                <h1 id="前言">前言</h1>
+<p>是时候把之前做ROV的一些东西给记下来了，纯属个人学习经验和过程，如有错误请指正。</p>
+
+<h1 id="rov的分类">ROV的分类</h1>
+<blockquote>
+  <p>根据国际海事承包商协会（IMCA）编制的《ROV安全有效作业实用准则》已经更新（现行为IMCA R004 REV.4）这个准则包括了一个有关ROV的扩展表单，这个表单基于全球ROV系统发展不断多样化而进行了更加明确的分类定义。</p>
+</blockquote>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfyn11taj30ky08x3zs.jpg" /></div>
+
+<blockquote>
+  <p>第一类：此类ROV只作为纯观察用途，它是一种相对廉价、并且可以非常方便携带的设备选择，客户可使用其对水下目标进行近距离的目视检查。这类ROV通常设计非常紧凑，因此它无法在大流速下使用；但是这类ROV可以安装部署在工作级ROV上，作为一个子机系统使用。</p>
+</blockquote>
+
+<blockquote>
+  <p>第二类A级：相比第一类而言有了更多的负载能力，可以在更复杂的情况(海洋、一定流速的水下)运行。</p>
+</blockquote>
+
+<blockquote>
+  <p>第二类B级：有较强的负载能力，可携带轻型机械手干预作业，需要有专用的LARS系统（启动回收系统）和控制箱</p>
+</blockquote>
+
+<blockquote>
+  <p>第三类A级：此类ROV可胜任包括调查、测量、建设、施工干预等大多数类型的水下工作，体型较大。</p>
+</blockquote>
+
+<blockquote>
+  <p>第三类B级：这类ROV系统在海洋油气领域的工作扮演了重要的角色，它都配备了大型的液压动力系统，用于承担关闭BOP（水下防喷器）及在钻井平台施工各个阶段的工作。</p>
+</blockquote>
+
+<blockquote>
+  <p>第四类A级：此类拖曳式水下机器人系统从设计和使用上其实相对简单，并且它只是使用机器在海底进行类似于农耕似的犁沟作业。这种简便的设计和使用给长距离的水下缆线敷设工程（诸如连同两岸的跨洋海底电缆敷设）提供了一种经济便捷的解决方案。</p>
+</blockquote>
+
+<blockquote>
+  <p>第四类B级：履带式水下机器人系统在水下电缆及管道的掩埋的工作中比使用拖曳式方案会花费更多的时间，但它的优势在于它能将缆线再固定深度掩埋的控制实现更加精准，并且缆线敷设的位置也更加精确，与此同时，这类机器人还有在岩石类海床上进行缆线敷设的能力。</p>
+</blockquote>
+
+<blockquote>
+  <p>第五类： 这类机器人系统通常是制造商为应对特殊使用场景的一次性项目。</p>
+</blockquote>
+
+<blockquote>
+  <p>第六类A级：这类AUV可以充当很多种任务角色，从搜集海洋研究机构所需要的各种数据到很多军事用途，诸如水雷对抗任务。</p>
+</blockquote>
+
+<blockquote>
+  <p>第六类B级：这类AUV提供了一个更强的负载能力以便安装更多类型的探测仪器及传感器，并且这类AUV有着潜在的干预作业的能力，但这类的很多都在不断的设计完善中，并且在商业用途中是被禁止使用的。</p>
+</blockquote>
+
+<h1 id="遥控型rov系统组成">遥控型ROV系统组成</h1>
+<p>通常来说，遥控型ROV系统组成如图：</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfynff1vj30dl0c8q32.jpg" /></div>
+
+<h1 id="rov系统设计">ROV系统设计</h1>
+<h3 id="rov总体设计">ROV总体设计</h3>
+<p>设计ROV时，先要从总体上要确定ROV的设计目的（观测？作业？或是？）、工作环境（静水？海洋？流速？）、外形设计（开架式或流线型）等，然后绘制总体框图，根据总体框图进行模块化设计（尽可能减少模块间的耦合）。此外，为了保持ROV稳定，需要调节重心与浮心的位置关系，浮心应在重心之上，ROV应尽量对称分布。</p>
+
+<p>之后，根据设计得出ROV的性能指标：负载能力(需要搭载多大质量的负载)、工作深度、航行速度(无特殊可设为1-2节，1节=1海里/小时=1.852km/h=0.514m/s)、尺寸、续航能力、空气中质量和水中质量(即浮力配置为零浮力、正浮力还是负浮力)等</p>
+
+<h3 id="水密耐压壳体设计">水密耐压壳体设计</h3>
+<p>水下耐压密封舱有两个作用：一是提供一个耐压且防水的环境来放置电路板、摄像头、电池等设备；二是可为ROV提供浮力。水密措施是ROV的一个必不可少的因素，也是一个难点。当前耐压舱主要有球形与圆柱形两种或二者结合。对于二者而言，圆柱舱提供的浮力大且利于摆放各类器件。而球形舱则有更好的强度和稳定性（浅水级）。浅水级ROV一般采取半球壳+椭圆舱构成ROV的耐压舱。</p>
+
+<p>对于如何进行防水，常采用灌封(采用环氧树脂、有机硅、聚氨酯等灌封胶灌封)或O圈密封(具有弹性，通过挤压伸张对密封舱进行密封，结构简单且成本低，建议选择压缩率15%-20%的O圈)，使用时注意涂抹硅脂进行润滑。</p>
+
+<p>耐压舱材料选择：金属常用铝合金、不锈钢、钛合金等；非金属常用：有机玻璃、PVC塑料等。</p>
+
+<h3 id="动力推进系统设计">动力推进系统设计</h3>
+<p>ROV的动力常用水下推进器(电)、也可选择液压推进或气动推进等方式。遥控式ROV一般有6个自由度（上浮下潜、前进后退、横移、航向、横滚、俯仰），也可选择其中几个自由度（例如某些开架式ROV不具备横滚的自由度）。为了达到这些自由度，就要采取合理的推进器布置方式。关于推进器可采用普通的推进器或矢量推进器。ROV的自由度决定了推进器的数量和布置。</p>
+
+<p>推进器常见布置方案：单推进器、双平行或四平行推进器(不同推力可产生不同力矩实现转向)、四推进器环形布置（机动性好，可实现横移）。</p>
+
+<p>推进器常见数量：4+4、2+4、2（矢量）+1等，根据情况选择。</p>
+
+<h3 id="观测照明系统设计">观测照明系统设计</h3>
+<h5 id="水下观测照明装置的选择">水下观测照明装置的选择</h5>
+<p>摄像头和探照灯是ROV必不可少的一部分，而它们的选择也是必不可少的，其中，摄像头因为光在水中的衰减和散射容易影响图像的质量，可通过选择合适的探照灯加以改善，建议尽量选择波长适中的光源，例如碘化铊灯、氙灯、LED灯<strong>(节能且色彩饱满，较为常用)</strong>等探照灯，而不适合采用白炽灯等光源。值得一提的是，在水中红外摄像头由于水的吸收衰减并不能达到很好的效果，所以无法使用。</p>
+
+<p>此外，摄像头无法暴露在水中，也需要水密措施，常见于布置在耐压仓的半球罩中，采用云台进行移动。而这就导致了必然会产生一定的折射，水中视角大约为空气视角的四分之三。为此，摄像头应选择广角镜头且透射率较高。</p>
+
+<h1 id="结语">结语</h1>
+<p>总而言之，ROV的设计是自上而下，从总体到模块，本文介绍了主要的总体设计，而其他具体的细节另外记录。</p>
+
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/2019/01/04/stm32PCB/" data-toggle="tooltip" data-placement="top" title="原理图设计——stm32最小系统">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/2019/01/23/Quartus/" data-toggle="tooltip" data-placement="top" title="FPGA学习（一）——Quartus">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+              
+
+
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread" data-thread-key="/blog/2019/01/22/ROV" data-title="浅水级ROV结构设计介绍(上)" data-url="http://localhost:4000/blog/2019/01/22/ROV/"></div>
+                </div>
+                <!-- 多说评论框 end -->
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"cnfeat"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: ''
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <!-- kill the Facebook and Weibo -->
+                    <li>
+                  
+                    </li>
+                    
+
+                    
+                    
+                    <!--
+                    
+                    -->
+
+                    <!--
+                    
+                    -->
+
+                    
+                    <!--
+                    
+                    -->
+
+                </ul>
+                <p class="copyright text-muted">
+                &copy; 2020 猴子啊 ❖ Powered by Jekyll.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js",function(){
+        hljs.initHighlightingOnLoad();
+    })
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+
+</body>
+
+</html>

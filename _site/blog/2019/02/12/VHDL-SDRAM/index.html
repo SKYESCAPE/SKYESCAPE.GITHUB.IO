@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员">
+
+    <title>FPGA学习(七)——SDRAM基础学习 - 听书人</title>
+
+    <link rel="canonical" href="http://localhost:4000/blog/2019/02/12/VHDL-SDRAM/">
+
+    <!-- Icons -->
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+
+
+
+
+
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">听书人</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">Archive</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">？？？</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/green.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="Tags">
+                        
+                        <a class="tag" href="/Tags/#VHDL" title="VHDL">VHDL</a>
+                        
+                        <a class="tag" href="/Tags/#FPGA" title="FPGA">FPGA</a>
+                        
+                    </div>
+                    <h1>FPGA学习(七)——SDRAM基础学习</h1>
+                    
+                    <span class="meta">Posted by HouJK on February 12, 2019</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
+
+                <h1 id="基本信息">基本信息</h1>
+<p>SDRAM有着存储容量大、读写速度块等优点，但是控制的时序比较复杂，本文采用镁光科技生产的SDRAM，型号MT48LC16M16A2TG，3V3供电，存储容量16M*16(共256Mb)，采用54引脚第二代TSOP封装，时钟频率133MHz，周期时间为7.5ns。</p>
+
+<h1 id="引脚信息">引脚信息</h1>
+<p>该SDRAM的引脚定义如下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">引脚</th>
+      <th style="text-align: center">名称</th>
+      <th style="text-align: center">意义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">CLK</td>
+      <td style="text-align: center">时钟</td>
+      <td style="text-align: center">上升沿有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">CKE</td>
+      <td style="text-align: center">时钟使能</td>
+      <td style="text-align: center">高电平时钟使能有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">A0~A12</td>
+      <td style="text-align: center">地址</td>
+      <td style="text-align: center">A0~A8列地址，A0~A12行地址</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">BA0~BA1</td>
+      <td style="text-align: center">Bank地址</td>
+      <td style="text-align: center">Bank地址，与行列地址配合使用</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">RAS#</td>
+      <td style="text-align: center">行触发</td>
+      <td style="text-align: center">当为低时行地址有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">CAS#</td>
+      <td style="text-align: center">列触发</td>
+      <td style="text-align: center">当为低时列地址有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">WE#</td>
+      <td style="text-align: center">写使能</td>
+      <td style="text-align: center">低电平有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">CS#</td>
+      <td style="text-align: center">片选</td>
+      <td style="text-align: center">低电平有效</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">DQMH/DQML</td>
+      <td style="text-align: center">数据屏蔽</td>
+      <td style="text-align: center">当为高时屏蔽数据</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">DQ0~DQ15</td>
+      <td style="text-align: center">数据</td>
+      <td style="text-align: center">输入输出数据线</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">VDD/VSS</td>
+      <td style="text-align: center">电源地</td>
+      <td style="text-align: center">电源地</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">VDDQ/VSSQ</td>
+      <td style="text-align: center">数据输出电源地</td>
+      <td style="text-align: center">信号电源、信号地</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">NC</td>
+      <td style="text-align: center">无连接</td>
+      <td style="text-align: center">备用、不连接</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="支持指令">支持指令</h1>
+<p>SDRAM控制时序之所以复杂在于除了读写指令以为，还需要其他指令来配合使用才能完成读写操作，以下是MT48LC16M16A2的指令真值表：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">命令</th>
+      <th style="text-align: center">CS#</th>
+      <th style="text-align: center">RAS#</th>
+      <th style="text-align: center">CAS#</th>
+      <th style="text-align: center">WE#</th>
+      <th style="text-align: center">DQM</th>
+      <th style="text-align: center">ADDR</th>
+      <th style="text-align: center">DQS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">禁止指令(NOP)</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">无操作(NOP)</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">页激活</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">Bank/Row</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">读操作</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">L/H8</td>
+      <td style="text-align: center">Bank/Col</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">写操作</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L/H8</td>
+      <td style="text-align: center">Bank/Col</td>
+      <td style="text-align: center">Valid</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">突发操作中止</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">Active</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">预充电</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">Code</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">刷新</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">配置模式寄存</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">X</td>
+      <td style="text-align: center">Op-Code</td>
+      <td style="text-align: center">X</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">写使能/输出使能</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">L</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">Active</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">写禁止/输出高阻</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">H</td>
+      <td style="text-align: center">-</td>
+      <td style="text-align: center">High-Z</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="基本操作">基本操作</h1>
+<h3 id="芯片初始化">芯片初始化</h3>
+<p>对SDRAM进行存取数据操作之前首先需要进行初始化，设置SDRAM的普通模式寄存器与扩展模式寄存器，从来确定SDRAM的工作方式(设置突发长度、突发类型、CAS潜伏期和工作模式)，基本步骤如下：</p>
+
+<ol>
+  <li>VDD与VDDQ同时上电、启动时钟(CKE=H、DQMH/DQML=H、其他为nop)</li>
+  <li>维持稳定的电源、稳定的时钟和NOP输入至少100us</li>
+  <li>对所有存储体进行预充电命令</li>
+  <li>执行两个自动刷新命令</li>
+  <li>执行LMR命令初始化模式寄存器<br />
+(LMR命令用来配置SDRAM工作模式寄存器，A0~A2用于配置突发长度，A3用于指定突发模式是连续型还是交替型，A4~A6用于指定CAS延迟时间，A7~A8用于指定操作模式，A9用于指定写突发模式，A10~A12为用户保留位，具体配置参考数据手册)</li>
+</ol>
+
+<h3 id="行有效">行有效</h3>
+<p>初始化后，需要对L-bank进行寻址，并同时确定行(由上表的页激活命令可知，在进行bank寻址时，RAS(Row Address Strobe，行地址选通脉冲)也处于低电平有效)。</p>
+
+<h3 id="列读写">列读写</h3>
+<p>在对L-bank寻址并确定行后，就需要对列地址寻址(<strong>SDRAM中行列地址线共用，均为A0~A12，故需要分开发送</strong>)，在发送列读写命令时必须与行有效命令有一个间隔，称为tRCD(RAS to CAS Delay，行地址选通脉冲到列地址选通脉冲的时间)，常用时钟周期表示。</p>
+
+<h3 id="读操作">读操作</h3>
+<p>对列地址进行寻址后，将会触发数据传输，但从存储单元中输出到真正出现在内存芯片的 I/O 接口之间还需要一定的时间（数据触发本身就有延迟，而且还需要进行信号放大），这段时间就是非常著名的CL(CAS Latency，列地址脉冲选通潜伏期），同常用时间周期表示。</p>
+
+<h3 id="写操作">写操作</h3>
+<p>与读操作相同，写操作也是在tRCD之后，但没有了CL时间，即无延时，且WE#处于有效状态。</p>
+
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/2019/01/28/VHDL/" data-toggle="tooltip" data-placement="top" title="FPGA学习(六)——VHDL顺序语句">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/2019/02/27/summary/" data-toggle="tooltip" data-placement="top" title="关于考研初试——待到山花烂漫时，她在丛中笑">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+              
+
+
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread" data-thread-key="/blog/2019/02/12/VHDL-SDRAM" data-title="FPGA学习(七)——SDRAM基础学习" data-url="http://localhost:4000/blog/2019/02/12/VHDL-SDRAM/"></div>
+                </div>
+                <!-- 多说评论框 end -->
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"cnfeat"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: ''
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <!-- kill the Facebook and Weibo -->
+                    <li>
+                  
+                    </li>
+                    
+
+                    
+                    
+                    <!--
+                    
+                    -->
+
+                    <!--
+                    
+                    -->
+
+                    
+                    <!--
+                    
+                    -->
+
+                </ul>
+                <p class="copyright text-muted">
+                &copy; 2020 猴子啊 ❖ Powered by Jekyll.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js",function(){
+        hljs.initHighlightingOnLoad();
+    })
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+
+</body>
+
+</html>

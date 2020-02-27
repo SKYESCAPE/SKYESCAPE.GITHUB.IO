@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员">
+
+    <title>FPGA学习(四)——VHDL操作符 - 听书人</title>
+
+    <link rel="canonical" href="http://localhost:4000/blog/2019/01/27/VHDL/">
+
+    <!-- Icons -->
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+
+
+
+
+
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">听书人</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">Archive</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">？？？</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/green.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="Tags">
+                        
+                        <a class="tag" href="/Tags/#VHDL" title="VHDL">VHDL</a>
+                        
+                        <a class="tag" href="/Tags/#FPGA" title="FPGA">FPGA</a>
+                        
+                    </div>
+                    <h1>FPGA学习(四)——VHDL操作符</h1>
+                    
+                    <span class="meta">Posted by HouJK on January 27, 2019</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
+
+                <h1 id="前言">前言</h1>
+<p>之前学习的标识符、数据对象和数据类型都是相对独立的，而接下来学习的操作符是将数据对象进行不同形式的组合以实现不同的功能。</p>
+
+<h1 id="操作符">操作符</h1>
+<h3 id="赋值操作符">赋值操作符</h3>
+<p>赋值操作符是更新被赋值数据对象（信号和变量）的在值，因此VHDL的赋值操作符如同之前介绍信号与变量时有所区别，赋值操作符可分为以下三种：</p>
+<ul>
+  <li>”&lt;=”是信号赋值操作符，可对标量型的信号类型对象或矢量型信号类型对象<strong>整体</strong>赋值。</li>
+  <li>”:=”是变量赋值操作符，也可对变量、常量、属性和信号的初始值进行赋值。</li>
+  <li>”=&gt;”是矢量型的数据对象的部分进行赋值的操作符。</li>
+</ul>
+
+<h3 id="逻辑操作符">逻辑操作符</h3>
+<p>VHDL支持七种逻辑操作符的运算，分别是<strong>not(按位取非)、and(按位取与)、or(按位取或)、nand(按位取与非)、nor(按位取或非)、xor(按位取亦或)、nxor(按位取同或)，</strong>这些逻辑操作符所支持的常用数据类型有bit、bit_vector、std_logic、std_logic_vector等。当出现连续逻辑运算时，为了提高可读性，应用括号进行分隔<strong>(注意逻辑运算时按位运算，两边操作数应该一致)</strong></p>
+
+<h3 id="算术操作符">算术操作符</h3>
+<p>VHDL的算术操作符只能操作相应的数据类型，而且有些不可综合，可用的数据类型有integer、signed、unsigned和real(不可综合)，算术操作符主要包括八种：+、-、*、/、**、abs、mod、rem。其中，+-*是可综合的，而/、mod、rem一般不可综合，仅在操作数是2的整数幂时可综合，**一般只支持综合左操作数是2的整数幂的情况，abs一般不支持综合。</p>
+
+<h3 id="关系操作符">关系操作符</h3>
+<p>VHDL的关系操作符的运算结果都是布尔类型(true or false)，它是对相同类型数据对象进行大小比较，包括六种：”=”(相等操作符)、”/=”(不相等操作符)、”&lt;”(小于操作符)、”&gt;”(大于操作符)、”&lt;=”(小于等于操作符)、”&gt;=”(大于等于操作符)。</p>
+
+<p>在使用关系操作符的时候，需要注意以下几个问题：</p>
+<ul>
+  <li>在进行两个操作数的关系操作时，两个操作数的数据类型必须一致或者定义了相关的重载函数。</li>
+  <li>”=”和”/=”适用于所有操作类型。</li>
+  <li>”&lt;”、”&gt;”、”&lt;=”、”&gt;=”使用与整形、实型、位矢量和数组类型。</li>
+  <li>”&lt;=”需要根据上下文判断是小于等于操作符还是信号赋值操作符。</li>
+</ul>
+
+<h3 id="移位操作符">移位操作符</h3>
+<p>移位操作符是对矢量数据对象进行以为操作，VHDL支持的移位操作符有六种：”sll”(逻辑左移操作符，最右边空出用0填充)、”srl”(逻辑右移操作符，最左边空出用0填充)、”sla”(算术左移操作符，最右边空出用用原来最右边的值填充)、”sra”(算术右移操作符，最左边空出用用原来最左边的值填充)、”rol”(循环左移操作符，最右边空出用原来最左边的值填充)、”ror”(循环右移操作符，最左边空出用原来最右边的值填充)。</p>
+
+<p>移位操作符的使用格式：<br />
+<code class="highlighter-rouge">操作数 移位操作符 进行移位的位数</code></p>
+
+<h3 id="连接操作符">连接操作符</h3>
+<p>连接操作符(‘&amp;’)是用不同的位来产生一个位数更多的矢量。可用于两个位、两个矢量或位和矢量的连接。</p>
+
+<h3 id="操作符的优先级">操作符的优先级</h3>
+<p>| 符号 | 优先级 |<br />
+|:—:|:—:|<br />
+| **、abs、not | 第一级 |<br />
+| *、/、mod、rem | 第二级 |<br />
+| +(正号)、-(负号) | 第三级 |<br />
+| +、-、&amp;| 第四级 |<br />
+| sll、sla、srl、sra、rol、ror | 第五级 |<br />
+| =、/=、&lt;、&lt;=、&gt;、&gt;= | 第六级 |<br />
+| and、or、nand、nor、xor、xnor | 第七级 |</p>
+
+<h3 id="操作符的重载">操作符的重载</h3>
+<p>对于预定操作符所作用的操作数数据类型必须一致，为了方便不同数据类型的数据对象进行操作，对要对操作符进行重新定义，即重载。</p>
+
+<p>例：加法的重载</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function "+" (l : std_logic: r : integer) return interger is
+variable sum : interger := 0 ;
+begin
+if l = '1' then
+sum := r + 1 ;
+else
+sum := r ;
+end if ;
+return sum ;
+end ;
+</code></pre></div></div>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/2019/01/25/VHDL-data/" data-toggle="tooltip" data-placement="top" title="FPGA学习(三)——VHDL数据对象和数据类型">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/2019/01/28/VHDL/" data-toggle="tooltip" data-placement="top" title="FPGA学习(五)——VHDL并行语句">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+              
+
+
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread" data-thread-key="/blog/2019/01/27/VHDL" data-title="FPGA学习(四)——VHDL操作符" data-url="http://localhost:4000/blog/2019/01/27/VHDL/"></div>
+                </div>
+                <!-- 多说评论框 end -->
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"cnfeat"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: ''
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <!-- kill the Facebook and Weibo -->
+                    <li>
+                  
+                    </li>
+                    
+
+                    
+                    
+                    <!--
+                    
+                    -->
+
+                    <!--
+                    
+                    -->
+
+                    
+                    <!--
+                    
+                    -->
+
+                </ul>
+                <p class="copyright text-muted">
+                &copy; 2020 猴子啊 ❖ Powered by Jekyll.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js",function(){
+        hljs.initHighlightingOnLoad();
+    })
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+
+</body>
+
+</html>

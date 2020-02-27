@@ -1,0 +1,12 @@
+I"�<p>今天来讲讲stm32系列的选型（本文参考野火工作室的开源资料，顺便强推野火系列的单片机），首先，要了解stm32有哪些类型，如下图所示，stm32系列有内核的区别，型号的区别以及芯片的性能区别。</p>
+
+<div align="center"><img src="http://wx2.sinaimg.cn/mw690/0066Un30ly1g0tfynzxnjj30pg0ce78q.jpg" /></div>
+
+<p>为此，有必要再了解一下stm32的命名方式，具体如下图所示</p>
+
+<div align="center"><img src="http://wx2.sinaimg.cn/mw690/0066Un30ly1g0tfyof0jhj311k0idn7s.jpg" /></div>
+
+<p>那么，我们要如何选择型号呢？首先你需要官方选型手册，下载地址：<a href="http://www.stmcu.org.cn/document/detail/index/id-218179" target="_black">STM32选型手册</a></p>
+
+<p>有了选型手册，接下来就是选择芯片了，一般采用的是以下原则：内核→资源→RAM和FLASH等，即先根据设计选择相应的内核，然后再根据使用到哪些资源选取符合的最小引脚，最后再考虑RAM和FLASH等。总之，性价比很重要，特别是做产品时可节约部分成本。作为一个学生党，我也比较喜欢用如F103、F407等资料较多的芯片，可作为参考。</p>
+:ET

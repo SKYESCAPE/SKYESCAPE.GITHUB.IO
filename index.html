@@ -3,8 +3,9 @@ layout: page
 description: "说书人叹天下旧事如潮，听书人悲欢不过一壶新茶"
 ---
 
+<!-- 博文预览 -->
 {% for post in paginator.posts %} <!-- 分页输出文章 -->
-<div class="post-preview"> <!-- 博文预览 -->
+<div class="post-preview"> 
     <a href="{{ post.url | prepend: site.baseurl }}"> <!-- 要访问的文章的url-->
         <h2 class="post-title">            
             {{ post.title }}   <!-- 输出文章标题 -->
@@ -18,21 +19,22 @@ description: "说书人叹天下旧事如潮，听书人悲欢不过一壶新茶
             {{ post.content | strip_html | truncate:150 }} <!-- 获取文章摘要，取前100个字符-->
         </div>
     </a>
+    <!-- 获取文章属性-->
     <p class="post-meta">Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}</p>
 </div>
 
 <hr>
 {% endfor %}
 
-<!-- Pager -->
-{% if paginator.total_pages > 1 %}
+<!-- 分页设置 -->
+{% if paginator.total_pages > 1 %} <!-- 页数大于1 -->
 <ul class="pager">
-    {% if paginator.previous_page %}
+    {% if paginator.previous_page %} <!-- 是否有上一页 -->
     <li class="previous">
         <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&larr; Newer Posts</a>
     </li>
     {% endif %}
-    {% if paginator.next_page %}
+    {% if paginator.next_page %} <!-- 是否有下一页 -->
     <li class="next">
         <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Older Posts &rarr;</a>
     </li>

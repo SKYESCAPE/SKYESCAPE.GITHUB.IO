@@ -1,0 +1,161 @@
+I"]<h1 id="前言">前言</h1>
+<p>紧随着之前的Quartus软件熟悉之后，依次学习了FPGA的VHDL语言的基本结构、数据对象、数据类型、操作符、并行语句、顺序语句等</p>
+
+<h1 id="vhdl的简单介绍">VHDL的简单介绍</h1>
+<p>VHDL语言，全称Very-High-Speed Integrated Circuit Hardware Description Language，即超高速集成电路硬件描述语言。</p>
+
+<h3 id="vhdl语言的特点">VHDL语言的特点：</h3>
+
+<ol>
+  <li>功能强大、设计简单</li>
+  <li>几乎所有EDA软件都支持VHDL语言，且易于修改</li>
+  <li>硬件描述能力强大(描述电路多样，描述方法多样)</li>
+  <li>独立于器件的设计、与工艺无关</li>
+  <li>可移植，易于共享和复用</li>
+</ol>
+
+<h1 id="vhdl语言的基本结构">VHDL语言的基本结构</h1>
+<p>VHDL语言的基本结构包含：库的引用(若只使用标准库则可不需要引用)、实体声明(必须)、结构体的声明(必须)、结构体的定义(必须)、配置(若只有一个结构体则无须配置)</p>
+
+<p>例：三输入与门VHDL程序结构</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>--库的引用 
+library ieee;  
+use ieee.std_logic_1164.all;  
+--实体声明
+entity xxx is  
+port(input_one : in std_logic;  
+     input_two : in std_logic;  
+     input_three : in std_logic  
+     y: out std_logic);  
+end xxx;  
+--结构体的声明 
+architecture yyy of xxx is  
+     signal temp: std_logic;  
+begin
+--结构的定义  
+     temp &lt;= input_one and input_two;  
+     y &lt;= temp and input_three;  
+end yyy;  
+</code></pre></div></div>
+
+<h2 id="库的引用vhdl的环境">库的引用(VHDL的环境)</h2>
+<p>VHDL的库一般是一些常用的VHDL代码的集合，它包括：数据类型的定义、函数的定义、子程序的定义、元件引用声明、常量的定义等一些可复用或共享的VHDL代码。</p>
+
+<p>库的声明格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library 库名;   
+use 库名.库中程序包.程序包中的项;   
+--(例子如上)   
+</code></pre></div></div>
+
+<p>ieee库是使用频率最高的库之一，它包括一些常用的数据类型的定义及相关的操作，其中包括std_logic_1164库(定义了std_logic和std_ulogic的数据类型)、std_logic_signed库(定义了与signed数据类型相关的函数)、std_logic_unsgned库(定义了与unsigned数据类型相关的函数)、std_logic_arith库(定义了一些不同类型数据之间相互转换的函数)以及math_real库等，可根据需要进行引用。</p>
+
+<h2 id="实体的声明vhdl的外壳">实体的声明(VHDL的外壳)</h2>
+<p>实体的声明是用于实体与其他实体或者外部接口相关联系的说明。实体包括实体名、端口定义和类属性定义。实体名一般取符合逻辑且有意义的名称，<strong>VHDL程序的文件名必须与实体名一致，在同一库中实体名必须是唯一的</strong>，端口的定义则提供了通道(同时定义了信号的流向)，<strong>对于硬件描述语言而言，端口定义十分重要，错误的定义可能会对硬件造成严重的破坏</strong>，类属性定义则是为了修改实体中的某些参数而不修改实体的程序。</p>
+
+<p>实体的声明格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>entity 实体名 is  
+Generic(参数名 ：数据类型 ：= 值);  
+port(端口名 ：端口模式  数据类型);  
+end 实体名;  
+</code></pre></div></div>
+
+<h2 id="端口的声明">端口的声明</h2>
+<p>端口的信号流向(即端口的模式)有一下五种：</p>
+
+<ul>
+  <li>输入模式(in)：端口信号流向从实体外部到实体内部。</li>
+  <li>输出模式(out)：端口信号流向从实体内部到实体外部。</li>
+  <li>双向模式(inout)：端口信号流向可从实体外部到实体内部，也可从实体内部到实体外部，但同一时刻只能进行某个流向的操作，一般需要有方向控制。</li>
+  <li>缓冲模式(buffer)：功能与INOUT类似，区别在于当需要读入数据时，只允许内部回读内部产生的输出信号，即反馈。（一般设计不采用buffer，若需要实现输出回读，可通过增加中间信号作为缓冲）</li>
+  <li>链接模式(linkage)</li>
+</ul>
+
+<h2 id="结构体的描述vhdl的灵魂">结构体的描述(VHDL的灵魂)</h2>
+<p>结构体的描述方法有四种：行为方式描述(behave)、数据流方式描述(dataflow)、结构化方式描述(construct)及以上三种方式组合。结构体一般由结构体名、结构体说明语句和结构体描述语句组成。结构体名可用描述方法来命名，也可根据习惯进行命名。结构体的说明语句包括结构体所用到的信号的定义和结构体所调用实体模块的引用。</p>
+
+<p>结构体的基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>architecture 结构体名 of 实体名 is  
+     结构体说明语句;  
+begin  
+     结构体描述语句;  
+end 结构体名;  
+</code></pre></div></div>
+
+<h3 id="数据流描述方式">数据流描述方式</h3>
+<p>数据流描述方式主要是应用于简单的逻辑功能实现，以信号赋值的方式来体现。</p>
+
+<p>例：三人表决器(两个以上通过为通过)</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library ieee;  
+use ieee.std_logic_1164.all;  
+entity xxx is  
+port(input_one : in std_logic;  
+     input_two : in std_logic;  
+     input_three : in std_logic  
+     ispass: out std_logic);  
+end xxx;  
+architecture yyy of xxx is  
+     signal tempone,temptwo,tempthree,tempfour: std_logic;  
+begin  
+     tempone &lt;= input_one and input_two and (not input_three);  
+     temptwo &lt;= input_one and input_three and (not input_two);  
+     tempthree &lt;= input_two and input_three and (not input_one);  
+     tempfour &lt;= input_one and input_two and input_three;  
+     ispass &lt;= tempone or temptwo or tempthree or tempfour;  
+end yyy;  
+</code></pre></div></div>
+
+<h3 id="行为描述方式">行为描述方式</h3>
+<p>行为描述方式主要是应用于逻辑功能相对复杂的VHDL程序中，可用进程语句来实现。</p>
+
+<p>例：三人表决器(两个以上通过为通过)</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library ieee;  
+use ieee.std_logic_1164.all;  
+entity xxx is  
+port(input_one : in std_logic;  
+     input_two : in std_logic;  
+     input_three : in std_logic  
+     ispass: out std_logic);  
+end xxx;  
+architecture yyy of xxx is  
+     signal temp: std_logic;  
+begin  
+     temp &lt;= input_one &amp; input_two &amp; input_three;  
+     process(temp)  
+     begin  
+          case temp is  
+          when "110" =&gt; ispass &lt;= '1'  
+          when "101" =&gt; ispass &lt;= '1'  
+          when "011" =&gt; ispass &lt;= '1'  
+          when "111" =&gt; ispass &lt;= '1'  
+          when others =&gt; ispass &lt;= '1'  
+     end process;  
+end yyy;  
+</code></pre></div></div>
+
+<h3 id="结构化描述方式">结构化描述方式</h3>
+<p>结构化描述方式是最高级别的描述，主要应用于模块化设计。一般是根据设计的逻辑功能进行模块划分，然后进行各个模块的设计与验证，最后在顶层文件中调用。</p>
+
+<p>例：三人表决器(两个以上通过为通过)</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>--一二通过，三不通过的子模块，在顶层文件中利用component调用
+library ieee;  
+use ieee.std_logic_1164.all;  
+entity xxx is  
+port(input_one : in std_logic;  
+     input_two : in std_logic;  
+     input_three : in std_logic  
+     ispass: out std_logic);  
+end xxx;  
+architecture yyy of xxx is        
+begin  
+     ispass &lt;= input_one and input_two and (not input_three);  
+end yyy;  
+</code></pre></div></div>
+
+:ET

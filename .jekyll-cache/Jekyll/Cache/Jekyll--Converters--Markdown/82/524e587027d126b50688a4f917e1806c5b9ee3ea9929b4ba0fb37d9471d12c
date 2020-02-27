@@ -1,0 +1,343 @@
+I"&<<h1 id="前言">前言</h1>
+<p>VHDL的描述语句分为并行语句与顺序语句。顺序语句与并行语句共同构成了VHDL的描述语句，是VHDL作为硬件描述语句的一大特点。并行语句是硬件描述语言的一大特点，它与像C语言的高级程序设计语言最大的不同是并行语句的执行是并行的，不会因为书写顺序的前后而产生执行时的先后。顺序语句只在仿真时间上是相对并行语句而言的，实际硬件的运行不一定是顺序执行的。</p>
+
+<p><strong>从形成的电路的角度，并行语句最终会有两种形式：</strong></p>
+<ul>
+  <li>并联或不相联的逻辑门或组合电路。因为是并联或不相联的，当然是同时执行。</li>
+  <li>由同一个时钟边沿驱动的D触发器，不论D触发器之间是并联、串联或者不相连的。因为触发器是在同一个时钟边沿同时翻转的，也就是同时执行，所以本质上就是并行。</li>
+</ul>
+
+<p><strong>而顺序语句只有一种情况</strong>，就是形成串联的逻辑门或组合电路。</p>
+
+<p>#并行语句
+VHDL支持的并行语句主要有七种：端口映射语句、信号赋值语句、when条件选择语句、generate语句、进程语句、过程调用语句和块语句。并行语句可以在结构体的begin与end之间的任何位置。<strong>并行语句之所以能够并行，在于VHDL程序的每一条语句甚至每一个操作符都可能对应一个硬件电路，而电路一直是并行的，相当于同时具有多个CPU</strong>(区别于C语言对应单独CPU顺序执行)。<strong>因此VHDL程序的每一行代码都要占用一定的FPGA资源，</strong>因此代码优化就格外重要。</p>
+
+<h3 id="映射语句和元件例化语句">映射语句和元件例化语句</h3>
+<p><strong>映射语句</strong>主要应用于模块调用，在例化模块时用于传递类属性参数和端口连接。使用方法如下例</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\-\-例：一个加了一个固定数的加法模块
+library ieee; 
+use ieee.std_logic_1164.all; 
+use ieee. std_logic_unsigned.all; 
+
+entity myadder is 
+\-\-声明一个类属性参数、一个固定数值的加数 
+generic( 
+     addend ： std_logic_vector(7 downto 0) ： = ”00001010" 
+     );
+port (data : in s td_ logic_vector( 7 downto 0); 
+     sumo : out std_logic_vector(7 downto 0)); 
+end myadder ;
+
+architecture dataflow of myadder is 
+begin  
+     sumo &lt;= data + addend ; \-\-做加法运箅
+end dataflow;
+</code></pre></div></div>
+
+<p><strong>component语句</strong>的意义是声明被引用模块的接口信息，以便调用该模块时正确进行端口 与类属性参数的连接。component的格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>component &lt;component_name&gt;
+     generic(
+     &lt;name&gt; : &lt;type&gt; ;
+     &lt;name&gt; : &lt;type&gt; := &lt;default_value&gt;
+     ) ;
+     port(
+     \-\-input ports
+     &lt;name&gt; : in &lt;type&gt; ;
+     \-\-inout ports
+     &lt;name&gt; : inout &lt;type&gt; ;
+     \-\-output ports
+     &lt;name&gt; : in &lt;type&gt; 
+     ) ;
+end component ;
+</code></pre></div></div>
+
+<p><strong>模块的例化</strong>就是在VHDL程序中用在结构体声明中声明的模块，模块例化一次就产生了一块硬件电路，例化两次就产生两块硬件电路。模块例化的格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;instance_name&gt; : &lt;component_name&gt;
+	generic map(
+		&lt;name&gt; =&gt; &lt;value&gt;,
+		...
+	) 
+	port map(
+		&lt;formal_input&gt; =&gt; &lt;expression&gt;,
+		&lt;formal_output&gt; =&gt; &lt;signal&gt;,
+		&lt;formal_inout&gt; =&gt; &lt;signal&gt;,
+	);
+</code></pre></div></div>
+
+<p>例：调用上述加法模块</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library ieee ; 
+use ieee.std_logic_1164.all ;
+\-\-由于调用了上述代码的模块，所以需要引用上述代码所在的库
+\-\-如果它们在同一目录下，则该代码的模块默认属于work库 
+\-\-由于work是默认被引用的，可以省略
+library work ;
+entity testmap is 
+	port(
+		dataone : in std_logic_vector(7 downto 0) ;
+		datatwo : in std_logic_vector(7 downto 0) ; 
+		datathree : in std_logic_vector(7 downto 0) ; 
+		sumone : out std_logic_vector(7 downto 0) ; 
+		sumtwo : out std_logic_vector(7 downto 0) ; 
+		sumthree : out std_logic_vector(7 downto 0) ;
+	)
+end testmap ;
+architectur construct of testmap is
+\-\-在结构声明部分，需要声明被引用的模块 
+\-\-声明被引用的模块格式与该模块的实体声明类似 
+\-\-类属性的参数不需要初始值，因为在调用时需要重新赋于新值
+component myadder 
+	generic (addend : std_logic_vector(7 downto 0) 
+	) ;
+	port(data : in std_logic_vector( 7 downto 0) ; 
+		 sumo : out std_logic_vector(7 downto 0) 
+	) ;
+end component ;
+begin
+\-\-例化模块myadder
+adderone : myadder
+\-\-类属性参数设置为10
+generic map( addend =&gt; "00001010"
+)
+\-\-端口连接方式一
+port map(data =&gt; dataone,
+		sumo =&gt;sumone
+		);
+
+\-\-例化模块myadder
+addertwo : myadder
+\-\-类属性参数设置为20
+generic map( addend =&gt; "00010100"
+)
+\-\-端口连接方式一
+port map(data =&gt; datatwo,
+		sumo =&gt;sumtwo
+		);
+
+\-\-例化模块myadder
+adderthree : myadder
+\-\-类属性参数设置为20
+generic map( addend =&gt; "00010100"
+)
+\-\-端口连接方式二
+\-\-端口连接方式二由于没有原端口的一一对应 
+\-\-所以在顺序上一定要与原端口的顺序保持完全一致，才是正确端口连接
+port map(datathree,
+		sumthree
+		);
+end construct ;
+</code></pre></div></div>
+
+<h3 id="并行赋值语句">并行赋值语句</h3>
+<p>并行陚值语句是最简单的并行语句，基本格式为：信号&lt;=表达式；并行賦值语句由4部分组成：左操作数、陚值操作符、”&lt;=”、表示式和”;”。其中，左操作数不能是输人端口信号，表达式中不能含有输出端口信号。</p>
+
+<h3 id="进程语句">进程语句</h3>
+<p>进程语句process是VHDL程序最常用与最重要的并行语句之一。进程本身是并行语句，多个process语句是并行执行的，但它却是由顺序语句组成的。它可以组合成组合电路，也可组合成时序电路。进程语句基本格式为：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: process(敏感信号列表)
+声明语句;
+begin
+	顺序语句1;
+	顺序语句2;
+	...
+end process ;
+</code></pre></div></div>
+
+<p>其中，标号是可选的，敏感信号列表至少需要有一个敏感信号。敏感信号的变化决定着进程是否执行，如果敏感信号列表没有信号，那进程永远挂起而不执行；如果进程敏感信号列表没有信号，则需要使用wait语句来代替敏感信号列表的功能。对于在敏感信号列表中需要列出哪些信号的一个简单的方法是：<strong>如果进程是实现组合逻辑功能，则赋值操作符右边的信号就应该都列入敏感信号列表（除非有特殊考虑）；如果进程是实现时序逻辑功能且没有一个异步信号，则只需要把时钟信号列人敏感信号列表就可以了；如果进程实现时序逻辑功能但有异步信号，则需要把时钟信号与异步信号列人敏感信号列表。</strong></p>
+
+<p>例：各种进程的使用方法</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library ieee ; 
+use ieee.std_logic_1164.all ; 
+use ieee.std_logic_unsigned.all ;
+
+entity useprocess is 
+port(clk : in std_logic ; 
+	da : in std_logic_vector(7 downto 0) ; 
+	db : in std_logic_vector(7 downto 0) ; 
+	rst : in std_logic ;
+	dand : out std_logic_vector(7 downto 0); 
+	isequal : out std_logic ; 
+	isless : out std_logic ; 
+	entout : out std_logic_vector(7 downto 0)
+) ; 
+end useprocess ;
+
+architecture behave of useprocess is 
+begin
+
+\-\-纯组合逻辑功能 
+\-\-敏感信号列表必须列出全部的右操作信号 
+andout: process(da, db) 
+begin 
+	dand&lt; = da and db ; 
+end process andout ; 
+
+\-\-纯同步的时序逻辑功能 
+\-\-敏感信号列表只需要列出时钟信号就可以
+process(clk) 
+begin 
+	if clk'event and elk = then 
+		if da = db then 
+			isequal &lt;= '1' ; 
+		else 
+			isequal &lt;= 'O' ; 
+		end if ; 
+	end if ;
+end process ; 
+
+\-\-没有敏感信号列表 
+\-\-需要使用wait语句来控制进程的启动 
+process 
+begin 
+	if da&lt;db then 
+		isless &lt;= '1' ; 
+	else 
+		isless&lt; = 'O' ; 
+	end if ; 
+\-\- wait语句控制进程的启动 
+\-\- until条件为真，启动进程 
+	wait until (elk’event and elk = '1') ; 
+end process ；
+ 
+\-\-带有异步信号的时序逻辑功能 
+\-\-敏感信号列表需要列出时钟信号与所有的异步信号 
+process(clk， rst) 
+\-\-进程声明部分声明一个变量cut 
+	variable cnt : std_logic_vector(7 downto 0) := "00000000" ;
+
+\-\-异步信号操作部分 
+	if rst = '1'  then 
+		cntout &lt;= "00000000" ; 
+		cnt := "00000000" ;
+\-\-同步信号操作部分 
+	elsif clk'event and clk = '1' then 
+	cnt := cnt + "00000001" ; 
+	cntout &lt;= cnt；
+	end if； 
+end process; 
+end behave；
+</code></pre></div></div>
+
+<h3 id="条件选择语句">条件选择语句</h3>
+<p>条件选择的作用是根据指定的条件表达式，根据它的多种可能进行相应的陚值。条件选择语句有when/else与with/select/when两种形式。条件选择语句是并行语句，但是它却可以由顺序语句来替换。可用进程中的if语句来替换when/else语句，用进程中的case语句来替换with/select/when语句。</p>
+
+<p>when/else形式基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>信号 &lt;= 表达式1 when 条件1 else
+	    表达式2 when 条件2 else
+		...
+		表达式n when 条件n else
+		表达式n+1 ;
+</code></pre></div></div>
+
+<p>with/select/when形式基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>信号 &lt;= 表达式1 when 条件1 ,
+		表达式2 when 条件2 ,
+		...
+		表达式n when 条件n ,
+		表达式n+1 when others ;
+</code></pre></div></div>
+
+<h3 id="generate生成语句">generate生成语句</h3>
+<p>generate生成语句是简化一些相关且有内在规律的并行语句的一种描述方式，有两种格式：for/generate语句和if/generate语句。for/generate语句在for循环语句中执行generat，而if/generate语句在if条件为真的情况下才执行generate。</p>
+
+<p>for/generate语句基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: for 循环变量 in 循环变量范围 generat
+声明语句 ;
+begin
+并行语句 ;
+end generate 标号 ;
+</code></pre></div></div>
+
+<p>if/generate语句基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: if 判断条件 generat
+声明语句 ;
+begin
+并行语句 ;
+end generate 标号 ;
+</code></pre></div></div>
+
+<h3 id="procedure语句">procedure语句</h3>
+<p>过程procedure是VHDL两种子程序（过程与函数）之一，可当作并行语句使用，出现在结构体中。过程procedure语句由两部分组成：过程头与过程体，基本格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>procedure 过程名 参数表 is
+	[说明部分]
+	begin
+		顺序语句 ;
+end procedure 过程名 ;
+</code></pre></div></div>
+
+<p>参数表是过程的对外接口，可以是信号、变量与常量。说明部分可以为过程声明变量。begin到end procedure之间是过程功能的实现部分，用顺序语句来描述。调用过程子程序时，当参数表中的输入信号发生变化时即执行过程中的顺序语句。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>--例：利用过程实现异或
+library ieee ;
+use ieee.std_logic_1164.all ; 
+use ieee.std_logic_unsigned.all ;
+
+entity useprocedure is 
+port (da : in std_logic_vector( 7 dovmto 0) ;
+	db : in std_logic_vector(7 downto 0) ; 
+	xoro : out std_logic_vector(7 downto 0)) ; 
+end useprocedure ; 
+
+architecture behave of useprocedure is 
+\-\-注意定义过程的位置 
+\-\-过程定义的格式 
+	procedure dxor( signal done : in std_logic_vector(7 dovmto 0) ; 
+				signal dtwo : in std_logic_vector(7 dovmto 0) ; 
+				signal dout : out std_logic_vector(7 downto 0)) is 
+	begin 
+		dout〈 = done xor dtwo ;  
+	end procedure dxor ; 
+begin 
+\-\-过程的调用 
+dxor(da, db， xoro) ; 
+end behave ;
+</code></pre></div></div>
+
+<h3 id="块语句">块语句</h3>
+<p>块语句是由两行或两行以上的并行语句组成的；一般这种并行语句有一定的内在联系，可能是共同组成一个逻辑功能。块语句有两种基本形式：简单块语句和保护块语句。保护块说明语句的意义与简单块说明语句的意义相同，保护表达式的意义是如果保护表达式为真，则执行下面的块语句；如果为假，则不执行下面的块语句。</p>
+
+<p>简单块语句基本格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: block
+	块说明语句 ;
+\-\-块说明语句可以是信号的声明、
+\-\-类属性的声明或是不需要任何的块说明语句。
+begin
+	并行语句 ;
+end block 标号 ;
+</code></pre></div></div>
+
+<p>保护块语句基本格式：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: block(保护表达式)
+	块说明语句 ;
+begin
+	并行语句 ;
+end block 标号 ;
+</code></pre></div></div>
+
+<h3 id="程序包">程序包</h3>
+<p>程序包是VHDL程序的共享部分，在程序包内定义的数据对象与子程序在引用该程序包的VHDL程序中是可见的，因此程序包是VHDL设计能够复用的一个具体体现。程序包可声明的数据对象与子程序有：类型、常量、文件、别名、元件、函数、过程。程序的使用分为3个过程：程序包的声明、程序包体的定义及使用use语句对程序包的引用。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">\-\-</span><span class="err">程序包声明的基本格式如下：</span>
+<span class="k">package</span> <span class="err">程序包名</span> <span class="n">is</span> 
+	<span class="err">声明语句</span><span class="m">1</span> <span class="p">;</span> 
+	<span class="err">声明语句</span><span class="m">2</span> <span class="p">;</span>
+	<span class="p">...</span> 
+	<span class="err">声明语句</span><span class="n">n</span> <span class="p">;</span>
+<span class="k">end</span> <span class="err">程序包名</span> <span class="p">;</span> 
+
+<span class="p">--</span><span class="err">程序包体的基本格式如下：</span> 
+<span class="k">package</span> <span class="n">body</span> <span class="err">程序包名</span> <span class="n">is</span> 
+<span class="err">函数或过程的定义</span> <span class="p">;</span>  
+<span class="n">end</span><span class="err">程序包</span> <span class="p">;</span> 
+</code></pre></div></div>
+:ET

@@ -1,0 +1,70 @@
+I"]<h1 id="前言">前言</h1>
+<p>由于毕业设计需要用到FPGA(我真的是头铁，为什么这么想不开，怕是我的学弟学妹们看到别告诉杨老师，不然我觉得他得neng死我)，可怜之前觉得太难又太忙就没好好学，现在学过的FPGA知识忘得也差不多了，然后就准备重头开始复习一次，顺便整理整理备忘，从最刚开始的软件安装到VHDL语言再到具体设计都写一遍。本篇记录Quartus的安装破解和设计流程</p>
+
+<h1 id="quartus软件的安装破解">Quartus软件的安装破解</h1>
+<h3 id="quartus软件的安装">Quartus软件的安装</h3>
+<p>先讲一下设计FPGA的软件Quartus(今后全部文章以Cyclone系列FPGA为例，反正其他我也不会)。首先是安装和破解，安装的话可从官网下载<strong>(直达链接：</strong><a href="https://www.intel.com/content/www/us/en/programmable/downloads/download-center.html" target="_black">Quartus</a> <strong>)</strong>
+，请谨慎选择自己需要的版本，说实话Quartus这个软件是有点坑爹的，按道理软件一般都向下兼容，但是Altera偏不，例如Cyclone Ⅱ系列只能使用Quartus 13.0和之前的版本，之后的版本均不支持。</p>
+
+<p>为了节省我宝贵的SSD空间，根据需求我选择官网中的独立文件下载，只下载13.0版本的主程序<strong>Quartus II Software (includes Nios II EDS)</strong> + 器件库<strong>Cyclone, Cyclone II, Cyclone III, Cyclone IV device support (includes all variations)</strong>，此外，还需要下载破解器 <strong>(直达链接：</strong><a href="https://pan.baidu.com/s/1-FKqXnYuAtVhSqledv2U0g" target="_black">破解器</a> <strong>；密码xohr)</strong>，此处仅提供Quartus 13.0和17.0的破解器，其他版本需要自行上网搜索。</p>
+
+<p>下载完后，先安装Quartus 13.0，选择安装地址(Quartus真心挺占位置，别放系统盘)，然后应该没有什么坑，可以顺利安装。</p>
+
+<h3 id="quartus软件的破解">Quartus软件的破解</h3>
+<p>安装完之后就是破解了，以13.0破解为例，根据电脑位数选择对应位数破解器(我的是X64)，步骤如下：</p>
+
+<ul>
+  <li>
+    <p>首先打开破解器，点击应用，出现未找到文件，选择是，根据安装目录找到sys_cpt.dll文件(常见位置：XXXXX\quartus\bin64)，点击打开将该文件破解。</p>
+  </li>
+  <li>
+    <p>在Quartus文件夹下找到license.dat文件(常见位置：XXXXX\quartus\bin64)，使用记事本打开，将会看到以下内容：</p>
+  </li>
+</ul>
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfyjz68uj30nv0bodh1.jpg" /></div>
+<p> </p>
+<ul>
+  <li>
+    <p>打开之前安装好的Quartus 13.0，依次点击菜单栏Tools→License Setup，可看到右边有Network Interface Card(NIC) ID，从中选取一个ID号(建议第一个或第二个)替换第2步图中的XXXXXXXXXXXX，保存。</p>
+  </li>
+  <li>
+    <p>最后打开Quartus 13.0，依旧进Lincese Setup，右上角选择Lincese file，选择刚刚保存的lincese.dat文件(常见地址：XXXXX\quartus\bin64)，点击OK，破解完毕。</p>
+  </li>
+</ul>
+
+<h3 id="quartus器件库安装">Quartus器件库安装</h3>
+<p>破解完成，打开软件，可能会提示你已经成功安装Quartus，但没有发现器件库(提示You successfully installed the Quartus II software,but did not install any devices.Do you want to launch the device installer to add devices?)，此时从官网下载的器件库Cyclone, Cyclone II, Cyclone III, Cyclone IV device support (includes all variations)就需要被安装，安装步骤如下：</p>
+
+<ul>
+  <li>打开Quartus Ⅱ 13.0 Device Installer(可采用两种方式打开，一种是通过开始菜单找到Quartus文件夹，另一种直接打开，常见位置：XXXXX\quartus\bin\dev_install.exe)，点击Next，根据位置选择从官网下载的器件库(qdz格式)进行安装，安装完成即可。</li>
+</ul>
+
+<h3 id="常见问题">常见问题</h3>
+<ul>
+  <li>
+    <p>编译时出现红色错误：Current license file does not support the xxxxxx device。这是没有破解成功的问题。(可能是dll文件没有破解成功或license.dat修改时ID号格式错误或输入错误)</p>
+  </li>
+  <li>
+    <p>破解器被禁止访问dll文件或者找不到dll文件，这是因为Quartus没有被关闭或者没有被彻底关闭，解决方法是关闭之或者杀死还在运行的和Quartus有关的进程。</p>
+  </li>
+  <li>
+    <p>Quartus下载(Programmer)找不到USB-Blaster：桌面我的电脑右键管理→设备管理器，此时USB-Blaster应该显示黄色感叹号，右键更新驱动程序，选择手动搜索，选择文件夹XXXXX\quartus\drivers\usb-blaster<strong>(切记勿继续选择子文件夹地址：XXXXX\quartus\drivers\usb-blaster\x64，这会导致无法找到驱动，文件夹一定到usb-blaster结束)</strong>，然后更新完毕就能显示了。若依旧不能显示则在系统服务中(同在我的电脑右键管理中)找到Altera JTAG Server，右键重启。如果显示无法签名(第三方INF不包含数字签名信息)的话，进入windows设置界面→更新和恢复→恢复→高级启动→立即重启，随后电脑重启并进入选择界面，依次选择疑难解答→高级选项→Windows启动设置→禁用驱动程序强制签名→重新启动，重新开机执行如上更新驱动便能解决。</p>
+  </li>
+</ul>
+
+<h1 id="quartus的主要设计方法">Quartus的主要设计方法</h1>
+<ol>
+  <li>创建工程(注意选择芯片、工程位置、设计文件、EDA工具等)</li>
+  <li>选择设计方式(原理图设计、文本输入设计、混合设计等)</li>
+  <li>完成设计，进行编译</li>
+  <li>建立仿真波形文件(建立vwf文件并设置时间区域和仿真信号并保存)</li>
+  <li>选择仿真设置：Assignments→Settings</li>
+  <li>建立仿真网表：Processing→Generate Functional Simulation Netlist</li>
+  <li>功能仿真测试逻辑功能：Processing→Start Simulation</li>
+  <li>时序仿真测试时序关系</li>
+  <li>引脚配置：Assignments→Pin Planner</li>
+  <li>全程编译：生成sof文件</li>
+  <li>下载程序</li>
+</ol>
+
+:ET

@@ -1,0 +1,166 @@
+I"7<h1 id="vhdl顺序语句">VHDL顺序语句</h1>
+<p>VHDL语言支持的顺序语句有：顺序赋值语句、wait语句、after语句、if语句、case语句、null语句、loop语句、exit语句、next语句、 assertion/report语句、return语句。<strong>顺序语句只能出现在进程、过程和函数中。且顺序语句不一定是顺序执行的。</strong>顺序语句是VHDL描述语句重要组成部分，但是不能从字面上理解为顺序语句在硬件上就是一条一条语句地顺序执行，应该从硬件的角度理解顺序语句只是一种描述方式，不要在意它的顺序性。(我的理解：顺序语句用来实现模型的算法描述，而并行语句表示各模型算法描述之间的连接关系，就像画电路图，并行语句就像一个个电路，先画哪个都可以，最后完成电路就行。顺序语句就是每个模块中怎么运行的算法)</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\-\-例：顺序赋值
+library ieee ; 
+use ieee. std_logic_1164. all ; 
+use ieee.std_logic_unsigned. all ;
+
+entity seq is 
+port(da : in std_logic ;
+	db : in std_logic ;
+	dc : in std_logic ;
+	pdao : out std_logic ; \-\-并行陚值语句
+	pdbo : out std_logic ; 
+	pdco : out std_logic ; 
+	sdao : out std_logic ; \-\-顺序陚值语句 
+	sdbo : out std_logic ; 
+	sdco : out stdlogic
+	) ; 
+end seq ;
+ 
+architecture behave of seq is 
+begin 
+\-\-并行陚值语句 
+	pdao &lt;= da ; 
+	pdbo &lt;= db ; 
+	pdco &lt;= dc ; 
+process (da. db. dc) 
+Begin 
+\-\-进程内的顺序陚值语句 
+	sdao &lt;= da ; 
+	sdbo &lt;= db ; 
+	sdco &lt;= dc ; 
+end process ; 
+end behave ;
+\-\-此程序仿真结果顺序赋值和并行赋值的信号在同一时刻更新。
+</code></pre></div></div>
+
+<h3 id="顺序赋值语句">顺序赋值语句</h3>
+<p>顺序赋值语句是出现在进程、过程和函数中的赋值语句。由于进程、过程和函数中可以出现变量的处理，所在顺序赋值语句不仅可以给信号陚值，还可以给变量赋值，它们的赋值格式之前已经有学过。</p>
+
+<h3 id="wait语句">wait语句</h3>
+<p>wait语句的功能是把一个进程挂起，直到满足等待的条件成立才重新开始该进程的执行。wait语句有三种基本形式：wait on(敏感信号列表)、wait until(判断条件表达式) 、wait for(时间) 。</p>
+
+<p>wait on语句(敏感信号列表)用于挂起进程，直到敏感信号列表中的信号发生变化时再次启动进程。基本格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>procee
+begin
+	顺序语句1 ;
+	顺序语句2 ;
+	...
+	顺序语句n ;
+	wait on(敏感信号列表) ;
+end process ;
+</code></pre></div></div>
+<p>wait until(判断条件表达式)是当判断条件表达式的信号发生变化且判断条件表达式的值为真时，wait until (判断条件表达式）所在的进程或过程将重新执行，直到wait until (判断条件表达式)所在的进程或是过程将被挂起。基本格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>procee
+begin
+	顺序语句1 ;
+	顺序语句2 ;
+	...
+	顺序语句n ;
+	wait until(判断条件表达式) ;
+end process ;
+</code></pre></div></div>
+
+<p>wait for(时间)是把进程挂起时间t后再启动进程。wait for语句一般用VHDL的测试文件，综合工具一般不支持。基本格式如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>procee
+begin
+	顺序语句1 ;
+	顺序语句2 ;
+	...
+	顺序语句n ;
+	wait for 时间t ;
+end process ;
+</code></pre></div></div>
+
+<h3 id="after语句">after语句</h3>
+<p>after语句是信号赋值延时语句，一般只在仿真或仿真测试时使用，基本格式如下：<br />
+<code class="highlighter-rouge">信号 &lt;= 表达式 after 时间 ;</code></p>
+
+<h3 id="if语句">if语句</h3>
+<p>if语句是顺序语句中最重要与最常用的顺序语句之一，功能是通过对分支条件的判断来决定执行哪个分支的顺序语句。if语句一般有3种基本形式：单分支if语句、双分支if语句、多分支if语句。基本格式为：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if 条件判断表达式1 then
+	顺序语句1 ;
+elsif 条件判断表达式2 then 
+	顺序语句2 ;
+...
+elsif 条件判断表达式n then
+	顺序语句n ;
+else 
+	顺序语句n+1 ;
+end if ;
+</code></pre></div></div>
+
+<h3 id="case语句">case语句</h3>
+<p>case语句也是顺序语句中最重要与最常用的顺序语句之一，其功能是通过对分支条件的判断来决定执行哪个分支的顺序语句。case语句一般有以下基本形式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>case 判断表达式is 
+when 选择项1 =&gt;
+	顺序语句1 ; 
+when 选择项2 =&gt; 
+	顺序语句2 ;
+...
+when 选择项n =&gt; 
+	顺序语句n ;
+when others =&gt;
+	顺序语句n+1 ;
+end case ;
+\-\-选择项的取值必须在判断表达式的取值范围内。
+\-\-各个选择项不能有重复。
+\-\-如果不能列举完判断表达式的所有情况则必须加others选择项。
+</code></pre></div></div>
+
+<h3 id="null语句">null语句</h3>
+<p>null语句的语法意义是不做任何操作，也没对应的综合结果。它只是显示说明在某些情况下不做任何操作，在一定程度上能提高VHDL程序的可读性，一般格式：null ;</p>
+
+<h3 id="loop语句">loop语句</h3>
+<p>loop语句的功能是循环执行一条或多条顺序语句，主要有3种基本形式:for循环形式、while循环形式、条件跳出形式。for循环形式的在循环变量超出循环变量的范围时跳出循环、while循环形式的loop语句在循环条件为假时跳出循环。</p>
+
+<p>for/loop循环形式的一般格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for 循环变量 in 循环变量范围 loop
+	顺序语句 ;
+end loop ;
+</code></pre></div></div>
+
+<p>while/loop循环形式的一般格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: while 循环条件 loop
+	顺序语句 ;
+end loop 标号 ;
+</code></pre></div></div>
+
+<p>exit语句格式有3种：</p>
+<ul>
+  <li>exit ;</li>
+  <li>exit loop 标号 ;</li>
+  <li>exit loop 标号 when 条件表达式 ;</li>
+</ul>
+
+<p>条件跳出循环形式的一般格式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>标号: loop
+	顺序语句 ;
+	exit when 跳出循环条件;
+end loop 标号 ;
+</code></pre></div></div>
+
+<p>next语句主要用在loop语句执行中进行有条件的或无条件的转向控制，基本格式有以下3种：</p>
+<ul>
+  <li>next ;(当loop内的顺序语句执行到next语句时，则无条件终止当前的循环并跳回到本次循环loop语句处开始下一次循环.)</li>
+  <li>next loop 标号 ;</li>
+  <li>next loop 标号 when 条件表达式 ;(分句“ when条件表达式”是执行next语句的条件，如果条件表达式的值为true,则执行next语句进人转跳操作。否则继续向下执行。)</li>
+</ul>
+
+<p>exit语句与next语句具有十分相似的语句格式和转跳功能，它们都是loop语句的内部循环控制语句。next语句是跳向loop语句的起始点，而exit语句则是跳向loop语句的终点。</p>
+
+<h3 id="return语句">return语句</h3>
+<p>return语句只能在函数中使用，用于返回函数的返回值，表达式的值就是函数的返回值。基本格式如下：<br />
+<code class="highlighter-rouge">return 表达式 ;</code></p>
+
+:ET

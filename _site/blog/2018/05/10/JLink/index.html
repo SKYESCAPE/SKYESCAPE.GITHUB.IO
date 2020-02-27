@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="硬件毁灭者，FPGA入坑玩家，想写点东西的闲散人员">
+
+    <title>JLink重刷固件库 - 听书人</title>
+
+    <link rel="canonical" href="http://localhost:4000/blog/2018/05/10/JLink/">
+
+    <!-- Icons -->
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/clean-blog.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+
+
+
+
+
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">听书人</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/about/">About</a>
+                </li>
+                
+                <li>
+                    <a href="/archive/">Archive</a>
+                </li>
+                
+                <li>
+                    <a href="/tags/">？？？</a>
+                </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/green.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="Tags">
+                        
+                        <a class="tag" href="/Tags/#JLink" title="JLink">JLink</a>
+                        
+                    </div>
+                    <h1>JLink重刷固件库</h1>
+                    
+                    <span class="meta">Posted by HouJK on May 10, 2018</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 post-container">
+
+                <p>之前做飞思卡尔比赛的时候总是出现JLink莫名灯灭，无法识别，然后换了好几个JLink终于忍不住自己刷了一次固件。下面是具体步骤。</p>
+
+<h1 id="jlink板子结构">JLink板子结构</h1>
+<p>常见的JLink内部如图，其中A为ERASE(擦除芯片)，B为TST(进入编程模式)，具体可通过测量ERASE为芯片55脚，TST为芯片40脚，另一端均为3V3</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfykqepkj30j60pk43s.jpg" /></div>
+
+<h1 id="重刷固件库">重刷固件库</h1>
+<h3 id="擦除芯片">擦除芯片</h3>
+<p>计算机USB连接JLink供电，短接ERASE与3V3，5-8秒后断开，断开连接停止供电。(<strong>某些板子上的ERASE与GND相连，务必使用万用表先测量一下，避免短接后电源与地短路</strong>)</p>
+
+<h3 id="进入编程模式">进入编程模式</h3>
+<p>短接TST与3V3，然后计算机USB连接JLink供电(提示无法识别)，10秒后断开USB停止供电，再断开TST与3V3。</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfyl8404j30a102yaa2.jpg" /></div>
+
+<h3 id="安装sam-ba_214">安装sam-ba_2.14</h3>
+
+<p>USB不连接，安装<a href="https://pan.baidu.com/s/1dv3h4S0ZDrsi1gcduVahiQ" target="_black">sam-ba_2.14</a> (密码1ay8，含JLink驱动)</p>
+
+<h3 id="烧录程序">烧录程序</h3>
+<p>安装完软件后，连接USB，电脑设备管理器(我的电脑右键管理，选择设备管理器，选择端口查看)识别AT91芯片，此时打开sam-ba_2.14，选择设备管理器中显示的端口，芯片选择at91sam7s64-ek，然后点击Connect</p>
+
+<div align="center"><img src="http://wx4.sinaimg.cn/mw690/0066Un30ly1g0tfylkrpnj30c704mmx8.jpg" /></div>
+
+<p>打开之后，选择Receive File前小文件夹图标并选择对应型号bin文件，之后点击Send File开始烧录。</p>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfylvcwlj30lu03raaa.jpg" /></div>
+
+<p>弹出以下两个对话框依次选择Yes、No。</p>
+
+<div align="center"><img src="http://wx2.sinaimg.cn/mw690/0066Un30ly1g0tfym75anj30ey06jglr.jpg" /></div>
+
+<div align="center"><img src="http://wx1.sinaimg.cn/mw690/0066Un30ly1g0tfymkrixj30eg06hdfy.jpg" /></div>
+
+<p>烧录完成后断开USB，再重新插上就识别为JLink驱动(驱动安装同上网址)</p>
+
+
+                <hr>
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/blog/2018/04/30/stm32/" data-toggle="tooltip" data-placement="top" title="STM32学习——选型">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/blog/2019/01/01/summary/" data-toggle="tooltip" data-placement="top" title="2018——旧的不去，新的不来">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+              
+
+
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread" data-thread-key="/blog/2018/05/10/JLink" data-title="JLink重刷固件库" data-url="http://localhost:4000/blog/2018/05/10/JLink/"></div>
+                </div>
+                <!-- 多说评论框 end -->
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"cnfeat"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: ''
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <!-- kill the Facebook and Weibo -->
+                    <li>
+                  
+                    </li>
+                    
+
+                    
+                    
+                    <!--
+                    
+                    -->
+
+                    <!--
+                    
+                    -->
+
+                    
+                    <!--
+                    
+                    -->
+
+                </ul>
+                <p class="copyright text-muted">
+                &copy; 2020 猴子啊 ❖ Powered by Jekyll.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/clean-blog.min.js "></script>
+
+
+
+<!-- Highlight.js -->
+<script>
+    async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js",function(){
+        hljs.initHighlightingOnLoad();
+    })
+</script>
+<link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+
+
+</body>
+
+</html>
