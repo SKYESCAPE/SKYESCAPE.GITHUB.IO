@@ -5,7 +5,7 @@ description: "Who am I？"
 header-img: "img/green.jpg"
 ---
 
-<font size=5 face="微软雅黑" >
+
   <center>我</center>
   <center>简简单单，普普通通</center>  
   <center>英语一生之敌</center>    
@@ -57,4 +57,4 @@ header-img: "img/green.jpg"
   
   
   <center>联系方式：Houjkouc@163.com</center>  
-  </font>
+
